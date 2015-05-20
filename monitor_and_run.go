@@ -1,11 +1,11 @@
 package main
 
 import (
+	"flag"
 	"github.com/howeyc/fsnotify"
 	"log"
 	"os"
 	"os/exec"
-	"flag"
 )
 
 var debug bool
@@ -17,7 +17,7 @@ func init() {
 	flag.BoolVar(&debug, "debug", false, "Set to true output log to STDOUT.")
 	flag.StringVar(&directory, "directory", "", "The directory to watch for changes. (Required)")
 	flag.StringVar(&script, "script", "", "The path to the script to execute on changes.")
-  flag.StringVar(&log_file, "log_file", "/tmp/monitor_and_run.log", "Where to create log file. Ignored when debug is true")
+	flag.StringVar(&log_file, "log_file", "/tmp/monitor_and_run.log", "Where to create log file. Ignored when debug is true")
 	flag.Parse()
 }
 
