@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/howeyc/fsnotify"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -71,11 +73,32 @@ func monitor_downloads(watcher *fsnotify.Watcher) {
 			log.Println("event:", ev)
 			if run_script {
 				log.Println("Running script...")
-				err := exec.Command(script).Run()
+
+				// exec.Command cannot be reused so declare it in the
+				// loop
+				cmd := exec.Command(script)
+				// Connect to cmd's stdout
+				stdout, err := cmd.StdoutPipe()
 				if err != nil {
+					log.Fatal(err)
+				}
+				// Start cmd
+				if err := cmd.Start(); err != nil {
 					log.Println("Error running script.", err)
 				} else {
+					// It started
 					log.Println("Script ran successfully.")
+					out, err := ioutil.ReadAll(stdout)
+					if err != nil {
+						log.Println("error: ioutil.ReadAll failed: ", err)
+					} else {
+						// Print cmd's stdout to STDOUT
+						fmt.Println(string(out))
+					}
+
+					if err := cmd.Wait(); err != nil {
+						log.Println("error: cmd.Wait() failed: ", err)
+					}
 				}
 			}
 		case err := <-watcher.Error:
